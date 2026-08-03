@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letterbox / Pillarbox Calculator - Black Bar Size</title>
+<meta name="description" content='Calculate letterbox or pillarbox black bar size in pixels when fitting a video into a different aspect ratio screen.'>
+<meta name="google-site-verification" content="REPLACE_ME">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    :root{
+      --bg:#0d0f11;--panel:#15181b;--line:#262b30;--text:#d8dee3;
+      --muted:#7c8791;--accent:#5ec9a6;--accent2:#e8b34f;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font-family:'IBM Plex Mono',monospace;line-height:1.5;
+      padding:32px 16px 64px;
+    }
+    .wrap{max-width:640px;margin:0 auto;}
+    h1{font-size:20px;margin:0 0 6px;color:#fff;font-weight:600;}
+    .desc{color:var(--muted);font-size:13px;margin:0 0 24px;}
+    .panel{
+      background:var(--panel);border:1px solid var(--line);
+      border-radius:6px;padding:20px;margin-bottom:20px;
+    }
+    label{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px;}
+    label:first-child{margin-top:0;}
+    input, select{
+      width:100%;background:#0a0c0e;border:1px solid var(--line);
+      color:var(--text);padding:9px 10px;border-radius:4px;
+      font-family:inherit;font-size:14px;
+    }
+    input:focus, select:focus{outline:1px solid var(--accent);}
+    button{
+      margin-top:18px;width:100%;background:var(--accent);
+      color:#08110d;border:none;padding:11px;border-radius:4px;
+      font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;
+    }
+    button:hover{opacity:0.9;}
+    .result{
+      margin-top:18px;padding:14px;border:1px dashed var(--line);
+      border-radius:4px;font-size:14px;min-height:20px;
+    }
+    .result .big{font-size:22px;color:var(--accent2);font-weight:600;display:block;margin-bottom:4px;}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}
+    th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;}
+    th{color:var(--muted);font-weight:600;}
+    .note{color:var(--muted);font-size:12px;margin-top:20px;}
+    a{color:var(--accent);}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Letterbox / Pillarbox Calculator</h1>
+  <p class="desc">Enter your video and target screen resolutions to calculate the black bar size.</p>
+  <div class="panel">
+    
+    <label for="vw">Video width (px)</label>
+    <input type="number" id="vw" placeholder="e.g. 1920" step="any">
+    <label for="vh">Video height (px)</label>
+    <input type="number" id="vh" placeholder="e.g. 800" step="any">
+    <label for="sw">Screen width (px)</label>
+    <input type="number" id="sw" placeholder="e.g. 1920" step="any">
+    <label for="sh">Screen height (px)</label>
+    <input type="number" id="sh" placeholder="e.g. 1080" step="any">
+  
+    <button onclick="calc()">Calculate</button>
+    <div class="result" id="result"></div>
+  </div>
+  <p class="note">Estimate only. Real-world results vary by codec, container and encoder settings.</p>
+</div>
+<script>
+
+function calc(){
+  var vw = parseFloat(document.getElementById('vw').value);
+  var vh = parseFloat(document.getElementById('vh').value);
+  var sw = parseFloat(document.getElementById('sw').value);
+  var sh = parseFloat(document.getElementById('sh').value);
+  var result = document.getElementById('result');
+  if (isNaN(vw) || isNaN(vh) || isNaN(sw) || isNaN(sh) || vw<=0 || vh<=0 || sw<=0 || sh<=0) {
+    result.innerHTML = 'Enter valid video and screen resolutions.';
+    return;
+  }
+  var videoAR = vw / vh;
+  var screenAR = sw / sh;
+  var outW, outH, barType, barSize;
+  if (videoAR > screenAR) {
+    outW = sw;
+    outH = Math.round(sw / videoAR);
+    barType = 'letterbox (top/bottom)';
+    barSize = Math.round((sh - outH) / 2);
+  } else {
+    outH = sh;
+    outW = Math.round(sh * videoAR);
+    barType = 'pillarbox (left/right)';
+    barSize = Math.round((sw - outW) / 2);
+  }
+  result.innerHTML = '<span class="big">' + barSize + ' px bars</span>' +
+    barType + ', video rendered at ' + outW + 'x' + outH;
+}
+
+</script>
+</body>
+</html>
